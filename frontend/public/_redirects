@@ -1,0 +1,7 @@
+/workout       /index.html 200
+/energy        /index.html 200
+/beacon        /index.html 200
+/rewards       /index.html 200
+/experiments   /index.html 200
+/settings      /index.html 200
+# Keep missing API endpoints as errors instead of returning application HTML.

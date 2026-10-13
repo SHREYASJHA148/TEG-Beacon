@@ -66,3 +66,6 @@ Version-1 REST ingestion and CSV/JSON replay are implemented. Serial gateway is 
 - Installation: use `npm ci` with the committed lockfile; dependencies are pinned. Backend lockfile pins transitive dependencies.
 
 Details: docs/PRD.md, TRD.md, API_REFERENCE.md, HARDWARE_INTEGRATION.md, DEMO_GUIDE.md and VALIDATION.md.
+
+## Netlify deployment
+The root `netlify.toml` builds from `frontend` and publishes its `dist` folder. React route rewrites ship in `frontend/public/_redirects`. See [deployment instructions](docs/DEPLOYMENT.md) for Netlify settings and the separately hosted Python backend. Set `VITE_API_URL` to the backend HTTPS origin before building; local development's API proxy does not run on Netlify.
