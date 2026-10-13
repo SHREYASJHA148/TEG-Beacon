@@ -26,3 +26,8 @@ SI conversion, missing current/open-circuit exclusion, trapezoidal integration, 
 - No hardware feasibility, loaded module suitability, transformer startup, practical usable reservoir energy, BLE range or sustainability claims were validated.
 
 No user presentation was edited; no commits, pushes or deployment performed.
+
+## Subsequent one-port hosting verification
+The unified release was committed/pushed after the original validation. FastAPI now serves the built frontend, SPA routes and API on one port. All 33 backend tests passed (23 existing + 10 hosting/security cases). Production frontend build passed. Live browser at port 8000 loaded the dashboard, started the simulation successfully, opened /experiments directly and refreshed it; no browser console errors were observed. Windows unified launcher successfully started the one-port process. The live homepage and JSON health endpoint responded 200 from the same port, and generated telemetry appeared in dashboard responses.
+
+Docker executable is installed, but its daemon was unavailable (Docker Desktop Linux engine pipe absent). Therefore the actual Docker image build/run was not executed locally. The Dockerfile and Render Docker Blueprint are prepared, but cloud deployment is not verified; a hosting-account deployment remains required. Persistent hosted storage remains a separate requirement for research data.

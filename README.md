@@ -20,6 +20,8 @@ This machine has no system Python. Its bundled runtime can create the environmen
 ```
 
 ## Run (two terminals)
+For the recommended one-port setup, build with `npm --prefix frontend run build`, then run `./start-unified.ps1` and open http://127.0.0.1:8000. The same FastAPI process serves the frontend and API. See [unified deployment](docs/UNIFIED_DEPLOYMENT.md) for deploying the whole app as one service. The two-terminal workflow below is for hot-reload development.
+
 From the project root:
 
 ```powershell

@@ -1,0 +1,12 @@
+.git
+.venv
+**/node_modules
+**/dist
+**/__pycache__
+**/.pytest_cache
+**/*.sqlite3*
+**/*.log
+.env
+.server-processes.json
+docs
+*.pptx

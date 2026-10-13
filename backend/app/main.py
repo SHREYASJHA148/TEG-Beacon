@@ -1,11 +1,15 @@
 import asyncio, csv, io, json, os, sqlite3
 from contextlib import asynccontextmanager
 from datetime import datetime, timezone
+from pathlib import Path
+from urllib.parse import urlsplit
 from fastapi import FastAPI, HTTPException, Request, Query
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import Response, JSONResponse
+from fastapi.responses import Response, JSONResponse, FileResponse
 from . import storage as store, services as svc, simulator
 from .schemas import Telemetry, Event, Experiment, Workout, Transition, Settings, SimulationStart
+
+FRONTEND_DIST=Path(os.getenv('THERMOTRACK_FRONTEND_DIST', str(Path(__file__).resolve().parents[2]/'frontend'/'dist'))).resolve()
 
 async def playback():
     while True:
@@ -37,7 +41,9 @@ async def local_guard(request: Request, call_next):
             return JSONResponse({'detail':'Mutations restricted to loopback; configure administrator token'},status_code=403)
         origin=request.headers.get('origin')
         allowed=os.getenv('THERMOTRACK_ORIGINS','http://localhost:5173,http://127.0.0.1:5173').split(',')
-        if origin and origin not in allowed: return JSONResponse({'detail':'Origin not allowed'},status_code=403)
+        parsed_origin=urlsplit(origin) if origin else None
+        same_origin=bool(parsed_origin and parsed_origin.scheme in ('http','https') and parsed_origin.netloc==request.url.netloc and parsed_origin.path=='')
+        if origin and origin not in allowed and not same_origin: return JSONResponse({'detail':'Origin not allowed'},status_code=403)
         length=request.headers.get('content-length')
         if length and int(length)>2_000_000: return JSONResponse({'detail':'Payload exceeds 2 MB'},status_code=413)
     return await call_next(request)
@@ -205,3 +211,17 @@ def reset():
         for table in ('rewards','events','telemetry','workouts','experiments'): db.execute(f"DELETE FROM {table} WHERE source='simulated'")
         svc.save_simulation(db,{'running':False,'scenario':'normal','step':0,'speed':1,'experiment_id':None})
     return {'status':'Synthetic demo records reset'}
+
+# Registered after API routes: unknown API URLs must never receive frontend HTML.
+@app.get('/{path:path}',include_in_schema=False)
+def frontend(path: str):
+    if path=='api' or path.startswith('api/'):
+        raise HTTPException(404,'API endpoint not found')
+    if path.strip('/') in ('','workout','energy','beacon','rewards','experiments','settings'):
+        target=FRONTEND_DIST/'index.html'
+        if not target.is_file(): raise HTTPException(503,'Frontend not built. Run npm ci and npm run build in frontend.')
+        return FileResponse(target,headers={'Cache-Control':'no-cache'})
+    target=(FRONTEND_DIST/path).resolve()
+    if not target.is_relative_to(FRONTEND_DIST) or not target.is_file():
+        raise HTTPException(404,'File not found')
+    return FileResponse(target,headers={'Cache-Control':'public, max-age=31536000, immutable' if path.startswith('assets/') else 'no-cache'})

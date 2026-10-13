@@ -1,5 +1,7 @@
 # Netlify frontend deployment
 
+**For frontend and backend deployed together, use [UNIFIED_DEPLOYMENT.md](UNIFIED_DEPLOYMENT.md).** The Render Blueprint now defines a single Docker service. The following Netlify instructions remain an alternative for separately hosting the frontend.
+
 The repository root `netlify.toml` sets base directory `frontend`, build command `npm run build`, and publish directory `dist` (relative to base). Deploy the Git-connected `main` branch. Netlify installs dependencies using the frontend lockfile. The public `_redirects` file supplies rewrites for the six supported React routes and is copied into the build output by Vite. Root `/` serves `dist/index.html`. Missing API paths remain errors, not app HTML.
 
 If Netlify's existing site settings override or do not discover the configuration, set:
