@@ -19,3 +19,10 @@ Backend variables:
 Backend launch command: `python -m uvicorn app.main:app --app-dir backend --host 0.0.0.0 --port PORT` with the provider's actual assigned port. TLS should be handled by the provider. This is still a single trusted-admin demonstration, not a multiuser production system.
 
 The routing/build fix resolves frontend hosting configuration. API-dependent features still require a reachable configured backend. No backend was deployed by this fix.
+
+## Quick Render setup
+Open https://dashboard.render.com/select-repo?type=blueprint and select SHREYASJHA148/TEG-Beacon (or use New → Blueprint in Render). The repository's `render.yaml` supplies the Python service, health check, allowed Netlify origin and a generated administrator secret. Deploy it, then copy the actual HTTPS service URL Render assigns. Do not guess the hostname.
+
+In Netlify → Project configuration → Environment variables, add `VITE_API_URL` equal to the Render service origin, without `/api/v1` or a trailing slash. Trigger a new production deploy. Check BACKEND_ORIGIN/api/v1/health responds with status=ok. In ThermoTrack → Settings, enter the Render `THERMOTRACK_ADMIN_TOKEN` value and save it for this tab to enable workouts/simulation/settings writes. Do not put that secret into the Netlify frontend build environment.
+
+The supplied free service is for disposable demonstrations: Render free services sleep and their filesystem is ephemeral, so SQLite records are lost when the service restarts, redeploys or spins down. Use persistent storage before collecting real research data. This configuration does not create a paid service or guarantee persistent hosted data.

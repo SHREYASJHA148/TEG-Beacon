@@ -1,0 +1,19 @@
+# Free demonstration host. SQLite resets when Render restarts/redeploys.
+# For retained research data, attach a persistent disk on a suitable plan.
+services:
+  - type: web
+    name: thermotrack-api
+    runtime: python
+    plan: free
+    buildCommand: pip install -r backend/requirements-lock.txt
+    startCommand: python -m uvicorn app.main:app --app-dir backend --host 0.0.0.0 --port $PORT
+    healthCheckPath: /api/v1/health
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.12.14
+      - key: THERMOTRACK_ORIGINS
+        value: https://teg-beacon.netlify.app
+      - key: THERMOTRACK_ADMIN_TOKEN
+        generateValue: true
+      - key: THERMOTRACK_DB
+        value: /tmp/thermotrack.sqlite3
