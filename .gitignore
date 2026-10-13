@@ -1,0 +1,12 @@
+node_modules/
+dist/
+.venv/
+__pycache__/
+.pytest_cache/
+*.sqlite3
+*.sqlite3-*
+.env
+*.log
+test-results/
+.server-processes.json
+*.tsbuildinfo

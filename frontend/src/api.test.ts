@@ -1,0 +1,5 @@
+import {describe,it,expect,vi,afterEach} from 'vitest';
+import {format,time,api} from './api';
+afterEach(()=>vi.unstubAllGlobals());
+describe('missing measurement presentation',()=>{it('keeps unavailable values empty',()=>{expect(format(null,'J')).toBe('—');expect(format(undefined)).toBe('—');});it('retains real zero',()=>{expect(format(0,'J')).toBe('0 J');});it('identifies no timestamps',()=>{expect(time(undefined)).toBe('No readings yet');});});
+describe('API error presentation',()=>{it('turns structured validation into a readable message',async()=>{vi.stubGlobal('sessionStorage',{getItem:()=>null});vi.stubGlobal('fetch',async()=>new Response(JSON.stringify({detail:[{msg:'Value error, Require low < ready ≤ high',input:{private:'not displayed'}}]}),{status:422}));await expect(api('/settings','PUT',{})).rejects.toThrow('Require low < ready ≤ high');});it('explains non-JSON backend errors',async()=>{vi.stubGlobal('sessionStorage',{getItem:()=>null});vi.stubGlobal('fetch',async()=>new Response('Proxy unavailable',{status:500}));await expect(api('/health')).rejects.toThrow('Backend unavailable');});});
